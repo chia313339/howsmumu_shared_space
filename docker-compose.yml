@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.3"
 
 services:
   app:
@@ -19,7 +19,7 @@ services:
              npm run build --prefix frontend &&
              npm run start"
     ports:
-      - "8301:3000"
+      - "8811:3000"
     restart: unless-stopped
 
 volumes:
