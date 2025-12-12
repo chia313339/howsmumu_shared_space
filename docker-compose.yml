@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  app:
+    image: node:20-bookworm-slim
+    working_dir: /app
+    env_file:
+      - .env
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/var/secrets/google/key.json
+    volumes:
+      - ./:/app
+      - node_modules:/app/node_modules
+      - frontend_node_modules:/app/frontend/node_modules
+      - /var/secrets/google/key.json:/var/secrets/google/key.json:ro
+    command: >
+      sh -c "npm install &&
+             npm install --prefix frontend &&
+             npm run build --prefix frontend &&
+             npm run start"
+    ports:
+      - "8301:3000"
+    restart: unless-stopped
+
+volumes:
+  node_modules:
+  frontend_node_modules:
