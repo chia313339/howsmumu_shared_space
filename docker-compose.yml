@@ -2,6 +2,7 @@ version: "3.3"
 
 services:
   app:
+    container_name: howsmumu_shared_space_app_1
     image: node:20-bookworm-slim
     working_dir: /app
     env_file:
@@ -20,8 +21,14 @@ services:
              npm run start"
     ports:
       - "8811:3000"
+    networks:
+      - my-net
     restart: unless-stopped
 
 volumes:
   node_modules:
   frontend_node_modules:
+
+networks:
+  my-net:
+    external: true
