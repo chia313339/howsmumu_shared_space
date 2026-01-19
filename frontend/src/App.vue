@@ -86,13 +86,16 @@
           <small class="text-muted">單檔限制 100MB</small>
         </div>
         <FileTable
-          :files="files"
+          :files="sortedFiles"
           :loading="loadingFiles"
           :selected="selected"
+          :sort-key="sortKey"
+          :sort-dir="sortDir"
           @download="startDownload"
           @delete="confirmDelete"
           @toggle="toggleSelection"
           @toggle-all="toggleAll"
+          @sort="setSort"
         />
       </div>
 
@@ -104,7 +107,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import UploadArea from './components/UploadArea.vue'
 import FileTable from './components/FileTable.vue'
 import { deleteFile, fetchFiles, loginRequest, logoutRequest, uploadFile } from './services/api'
@@ -120,6 +123,31 @@ const files = ref([])
 const status = ref('')
 const selected = ref([])
 const deleting = ref(false)
+const sortKey = ref('updated')
+const sortDir = ref('desc')
+
+const sortedFiles = computed(() => {
+  const list = [...files.value]
+  const key = sortKey.value
+  const dir = sortDir.value === 'asc' ? 1 : -1
+  list.sort((a, b) => {
+    let result = 0
+    if (key === 'name') {
+      result = (a.name || '').localeCompare(b.name || '', undefined, {
+        numeric: true,
+        sensitivity: 'base'
+      })
+    } else if (key === 'size') {
+      result = (a.size || 0) - (b.size || 0)
+    } else {
+      const aTime = a.updated ? new Date(a.updated).getTime() : 0
+      const bTime = b.updated ? new Date(b.updated).getTime() : 0
+      result = aTime - bTime
+    }
+    return result * dir
+  })
+  return list
+})
 
 onMounted(async () => {
   await tryBootstrapSession()
@@ -243,6 +271,15 @@ function toggleAll (checked) {
   } else {
     selected.value = []
   }
+}
+
+function setSort (key) {
+  if (sortKey.value === key) {
+    sortDir.value = sortDir.value === 'asc' ? 'desc' : 'asc'
+    return
+  }
+  sortKey.value = key
+  sortDir.value = key === 'name' ? 'asc' : 'desc'
 }
 
 function bulkDownload () {

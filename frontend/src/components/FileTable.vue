@@ -12,9 +12,33 @@
               @change="$emit('toggle-all', !allSelected)"
             >
           </th>
-          <th>檔名</th>
-          <th style="min-width: 170px;">上傳時間</th>
-          <th style="min-width: 120px;">大小</th>
+          <th>
+            <button
+              type="button"
+              class="btn btn-link p-0 text-decoration-none sort-button"
+              @click="$emit('sort', 'name')"
+            >
+              檔名 <i :class="sortIcon('name')"></i>
+            </button>
+          </th>
+          <th style="min-width: 170px;">
+            <button
+              type="button"
+              class="btn btn-link p-0 text-decoration-none sort-button"
+              @click="$emit('sort', 'updated')"
+            >
+              上傳時間 <i :class="sortIcon('updated')"></i>
+            </button>
+          </th>
+          <th style="min-width: 120px;">
+            <button
+              type="button"
+              class="btn btn-link p-0 text-decoration-none sort-button"
+              @click="$emit('sort', 'size')"
+            >
+              大小 <i :class="sortIcon('size')"></i>
+            </button>
+          </th>
           <th class="text-end" style="min-width: 140px;">動作</th>
         </tr>
       </thead>
@@ -71,10 +95,23 @@ const props = defineProps({
   selected: {
     type: Array,
     default: () => []
+  },
+  sortKey: {
+    type: String,
+    default: 'updated'
+  },
+  sortDir: {
+    type: String,
+    default: 'desc'
   }
 })
 
 const allSelected = computed(() => props.files.length > 0 && props.selected.length === props.files.length)
+
+function sortIcon (key) {
+  if (props.sortKey !== key) return 'bi bi-arrow-down-up text-muted'
+  return props.sortDir === 'asc' ? 'bi bi-sort-up' : 'bi bi-sort-down'
+}
 
 function formatDate (value) {
   if (!value) return '-'

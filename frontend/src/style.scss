@@ -35,3 +35,15 @@ body {
   background: rgba(75, 139, 255, 0.12);
   color: #2b5ec2;
 }
+
+.sort-button {
+  color: inherit;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.sort-button:focus {
+  box-shadow: none;
+}

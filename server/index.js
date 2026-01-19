@@ -216,9 +216,13 @@ function sanitizeFilename (name) {
 }
 
 function decodeFilename (name) {
-  // multer/Node treats multipart filenames as latin1; convert to UTF-8 to keep CJK names
+  // Convert latin1-encoded UTF-8 to a proper UTF-8 string while keeping valid Unicode intact.
   try {
-    return Buffer.from(name, 'latin1').toString('utf8')
+    if (!name) return name
+    const isLatin1 = Array.from(name).every((char) => char.charCodeAt(0) <= 0xff)
+    if (!isLatin1) return name
+    const decoded = Buffer.from(name, 'latin1').toString('utf8')
+    return decoded.includes('\uFFFD') ? name : decoded
   } catch (e) {
     return name
   }
